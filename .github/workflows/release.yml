@@ -1,0 +1,108 @@
+permissions:
+  contents: write
+  actions: write
+
+name: Release
+
+on:
+  push:
+    tags:
+    - 'v*'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build-linux:
+    runs-on: "ubuntu-latest"
+    steps:
+    - name: Install Linux dependencies
+      run: sudo apt install libasound2-dev
+
+    - name: Check out code
+      uses: actions/checkout@v4
+
+    - name: Install target
+      run: rustup target install x86_64-unknown-linux-gnu
+
+    - name: Build for target
+      run: cargo build --verbose --release --target x86_64-unknown-linux-gnu
+
+    - name: Rename binary
+      run: |
+        cd target/x86_64-unknown-linux-gnu/release
+        mv miditoqwerty-rs miditoqwerty-rs-linux-x86-64
+
+    - name: Upload binary
+      uses: actions/upload-artifact@v4.4.3
+      with:
+        name: miditoqwerty-rs-linux-x86-64
+        path: target/x86_64-unknown-linux-gnu/release/miditoqwerty-rs-linux-x86-64
+
+  build-windows:
+    runs-on: "windows-latest"
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v4
+
+    - name: Install target
+      run: rustup target install x86_64-pc-windows-msvc
+
+    - name: Build for target
+      run: cargo build --verbose --release --target x86_64-pc-windows-msvc
+
+    - name: Rename binary
+      run: |
+        cd target/x86_64-pc-windows-msvc/release
+        mv miditoqwerty-rs.exe miditoqwerty-rs-windows-x86-64.exe
+
+    - name: Upload binary
+      uses: actions/upload-artifact@v4.4.3
+      with:
+        name: miditoqwerty-rs-windows-x86-64.exe
+        path: target/x86_64-pc-windows-msvc/release/miditoqwerty-rs-windows-x86-64.exe
+
+  build-macos:
+    runs-on: "macos-latest"
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v4
+
+    - name: Install target
+      run: rustup target install x86_64-unknown-linux-gnu
+
+    - name: Install macOS Intel target
+      run: rustup target install x86_64-apple-darwin
+
+    - name: Install bundle
+      run: cargo install cargo-bundle
+
+    - name: Build for target
+      run: cargo bundle --release --target x86_64-apple-darwin
+
+    - name: Zip bundle
+      run: |
+        cd target/x86_64-apple-darwin/release/bundle/osx
+        zip -r miditoqwerty-rs-mac-x86_64.app.zip ./*
+
+    - name: Upload bundle
+      uses: actions/upload-artifact@v4.4.3
+      with:
+        name: miditoqwerty-rs-mac-x86_64.app.zip
+        path: target/x86_64-apple-darwin/release/bundle/osx/miditoqwerty-rs-mac-x86_64.app.zip
+
+  release:
+    needs: [build-linux, build-windows, build-macos]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: binaries
+          pattern: "*"
+          merge-multiple: true
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: binaries/*

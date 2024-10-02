@@ -1,0 +1,28 @@
+name: Check
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  check:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+
+    steps:
+    - name: Install Linux dependencies
+      if: runner.os == 'Linux'
+      run: sudo apt install libasound2-dev
+
+    - name: Check out code
+      uses: actions/checkout@v4
+
+    - name: Check on ${{ matrix.os }}
+      run: cargo check --verbose

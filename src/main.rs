@@ -87,7 +87,11 @@ fn midi_update_thread(midi: MidiInput, settings: &Arc<RwLock<Settings>>, keyboar
                     midi_event::Event::Midi(event) => {
                         let keypresses: KeyEvents = match event.event {
                             MidiEventType::NoteOn(note, velocity) => {
-                                settings.try_read().unwrap().output_method.lock().unwrap().press_note(note, velocity).clone()
+                                if velocity == 0 { // Some pianos (Alesis Recital Grand, reportedly) send a NoteOn with 0 velocity instead of NoteOff
+                                    settings.try_read().unwrap().output_method.lock().unwrap().release_note(note).clone()
+                                } else { // Non-zero, real down press
+                                    settings.try_read().unwrap().output_method.lock().unwrap().press_note(note, velocity).clone()
+                                }
                             }
                             MidiEventType::NoteOff(note, _) => {
                                 settings.try_read().unwrap().output_method.lock().unwrap().release_note(note).clone()

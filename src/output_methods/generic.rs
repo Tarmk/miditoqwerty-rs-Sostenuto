@@ -16,7 +16,14 @@ fn str_for_note(note: Note) -> Option<String> {
 }
 
 pub struct Inner{
-    pub pressed_chars: [u8; 127] // OS key codes [idx] -> times pressed [u8]
+    pressed_chars: [u8; 127], // OS key codes [idx] -> times pressed [u8]
+    space_down: bool,
+}
+
+impl Inner {
+    pub fn new() -> Self {
+        Inner {pressed_chars: [0; 127], space_down: false}
+    }
 }
 
 impl InputMethod for Inner {
@@ -79,15 +86,20 @@ impl InputMethod for Inner {
 
     fn reset(&mut self) {
         self.pressed_chars = [0; 127];
+        self.space_down = false;
     }
 
-    fn process_sustain(&self, value: u8) -> KeyEvents {
+    fn process_sustain(&mut self, value: u8) -> KeyEvents {
         println!("[Generic]: Processing sustain: {}", value);
 
-        if value >= 64 {
+        if value >= 64 && !self.space_down {
+            self.space_down = true;
             vec![KeyEvent::Press(Key::new("space"))]
-        } else {
+        } else if value < 64 && self.space_down {
+            self.space_down = false;
             vec![KeyEvent::Release(Key::new("space"))]
+        } else {
+            vec![]
         }
     }
 }

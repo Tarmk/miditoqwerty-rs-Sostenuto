@@ -14,7 +14,7 @@ pub trait InputMethod {
     fn press_note(&mut self, note: Note, velocity: u8) -> KeyEvents;
     fn release_note(&mut self, note: Note) -> KeyEvents;
     fn reset(&mut self);
-    fn process_sustain(&self, value: u8) -> KeyEvents;
+    fn process_sustain(&mut self, value: u8) -> KeyEvents;
 }
 
 

@@ -47,10 +47,10 @@ impl Settings {
     fn new(method: AvailableInputMethod) -> Self {
         match method {
             AvailableInputMethod::Generic => {
-                Self { output_method: Arc::new(Mutex::new(generic_inner{pressed_chars: [0; 127]})), port: None, output: true }
+                Self { output_method: Arc::new(Mutex::new(generic_inner::new())), port: None, output: true }
             }
             AvailableInputMethod::PV => {
-                Self { output_method: Arc::new(Mutex::new(pv_inner{pressed_chars: [0; 127]})), port: None, output: true }
+                Self { output_method: Arc::new(Mutex::new(pv_inner::new())), port: None, output: true }
             }
             AvailableInputMethod::PianoRooms => {
                 Self { output_method: Arc::new(Mutex::new(piano_rooms_inner)), port: None, output: true }
@@ -271,12 +271,12 @@ fn main() -> eframe::Result<()> {
                     if ui.selectable_label(false, "Generic").on_hover_text("Basic QWERTY system, no 88-key or velocity support").clicked() {
                         let mut my_settings = settings.write().unwrap();
                         settings_update_tx.send(true).expect("Failed to update listener");
-                        my_settings.output_method = Arc::new(Mutex::new(generic_inner{pressed_chars: [0; 127]}))
+                        my_settings.output_method = Arc::new(Mutex::new(generic_inner::new()))
                     }
                     if ui.selectable_label(false, "Piano Visualizations").on_hover_text("Uses control for 88-key and alt for velocity").clicked() {
                         let mut my_settings = settings.write().unwrap();
                         settings_update_tx.send(true).expect("Failed to update listener");
-                        my_settings.output_method = Arc::new(Mutex::new(pv_inner{pressed_chars: [0; 127]}))
+                        my_settings.output_method = Arc::new(Mutex::new(pv_inner::new()))
                     }
                     if ui.selectable_label(false, "Piano Rooms").on_hover_text("Uses the custom numpad input system\nimplemented by Piano Rooms").clicked() {
                         let mut my_settings = settings.write().unwrap();

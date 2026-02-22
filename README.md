@@ -1,4 +1,9 @@
-# miditoqwerty-rs
+# miditoqwerty-rs-Sostenuto
+
+This is a version of Arijan's Converter, where I implemented usage of Sostenuto Pedal
+To use, map in game as below:
+Toggle Sostenuto : LeftBracket
+Sostenuto Pedal : RightBracket
 
 Simple MIDI input to QWERTY output tool for macOS, Linux, and Windows.
 

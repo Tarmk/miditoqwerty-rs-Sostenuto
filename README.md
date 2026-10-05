@@ -26,7 +26,7 @@ cargo build --release
 ./target/release/miditoqwerty-rs
 ```
 
-Rust 1.75+ and `cargo` are the only requirements on Windows and macOS.
+A current stable Rust toolchain (`rustup`) is the only requirement on Windows and macOS.
 
 ## Troubleshooting on macOS
 

@@ -5,6 +5,7 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:
 
 env:
   CARGO_TERM_COLOR: always
@@ -13,16 +14,23 @@ jobs:
   check:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
     - name: Install Linux dependencies
       if: runner.os == 'Linux'
-      run: sudo apt install libasound2-dev
+      run: sudo apt-get update && sudo apt-get install -y libasound2-dev
 
     - name: Check out code
       uses: actions/checkout@v4
 
-    - name: Check on ${{ matrix.os }}
-      run: cargo check --verbose
+    - name: Cache build
+      uses: Swatinem/rust-cache@v2
+
+    - name: Build on ${{ matrix.os }}
+      run: cargo build --locked
+
+    - name: Test on ${{ matrix.os }}
+      run: cargo test --locked

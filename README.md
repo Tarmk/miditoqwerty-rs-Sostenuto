@@ -1,16 +1,26 @@
 # miditoqwerty-rs (Sostenuto fork)
 
+[![Check](https://github.com/Tarmk/miditoqwerty-rs-Sostenuto/actions/workflows/check.yml/badge.svg)](https://github.com/Tarmk/miditoqwerty-rs-Sostenuto/actions/workflows/check.yml)
+
 A fork of [ArijanJ/miditoqwerty-rs](https://github.com/ArijanJ/miditoqwerty-rs), the simple MIDI-input-to-QWERTY-output tool for macOS, Linux and Windows, with **sostenuto pedal support** added so the middle pedal on a digital piano does something useful in games that only read keyboard input.
 
 ## What this fork adds
 
-- **Sostenuto pedal (MIDI CC 66)** is translated into keyboard events, next to the existing sustain handling.
-- Two new binds in *Settings → Binds*:
-  - `Toggle Sostenuto` – default **LeftBracket** `[`
-  - `Sostenuto Pedal` – default **RightBracket** `]`
-- A console window on Windows so you can see what is being sent.
+- **Sostenuto pedal (MIDI CC 66).** While the middle pedal is down the app holds **`]`** (RightBracket) and releases it when the pedal comes up, the same way the sustain pedal holds Space. Works with the *Generic* and *Piano Visualizations* output methods; *Piano Rooms* ignores it because its protocol has no sostenuto.
+- Unit tests for the pedal logic, and CI that builds and tests on Windows, macOS and Linux.
 
-Map the same two keys inside the game you are playing and the pedal just works.
+### Setting it up in a game
+
+In the game's own key settings, bind:
+
+| Game action | Key |
+|---|---|
+| Sostenuto Pedal | `]` RightBracket |
+| Toggle Sostenuto | `[` LeftBracket |
+
+The app only sends `]`, held for as long as the pedal is down. Putting the game's toggle on `[` keeps it next to the pedal key and away from the note keys.
+
+The Windows build keeps its console window open, which logs every MIDI message and key it sends; handy when a pedal does not seem to work.
 
 ## Download
 
@@ -23,6 +33,7 @@ For macOS/Linux build from source (below) or use the upstream releases at https:
 ```bash
 # Linux needs the ALSA headers: sudo apt install libasound2-dev
 cargo build --release
+cargo test            # pedal logic tests
 ./target/release/miditoqwerty-rs
 ```
 

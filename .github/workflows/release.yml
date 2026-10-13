@@ -17,7 +17,7 @@ jobs:
     runs-on: "ubuntu-latest"
     steps:
     - name: Install Linux dependencies
-      run: sudo apt install libasound2-dev
+      run: sudo apt-get update && sudo apt-get install -y libasound2-dev
 
     - name: Check out code
       uses: actions/checkout@v4
